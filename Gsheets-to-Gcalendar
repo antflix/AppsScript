@@ -1,0 +1,102 @@
+
+function onOpen() {
+  var ui = SpreadsheetApp.getUi();
+  ui.createMenu('Anthonys Custom Calendar Sync Button 5000')
+    .addItem('Sync Now', 'syncCalendarEvents')
+    .addToUi();
+}
+
+function syncCalendarEvents() {
+  var spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = spreadsheet.getActiveSheet();
+
+  // Clear existing calendar events
+  var calendar = CalendarApp.getCalendarById("ENTER YOUR CALENDAR ID HERE")
+  var events = calendar.getEvents(new Date("2000-01-01"), new Date("2100-01-01"));
+  for (var i = 0; i < events.length; i++) {
+    events[i].deleteEvent();
+  }
+
+  // Get all data from the sheet
+  var data = sheet.getDataRange().getValues();
+
+  // Available color IDs
+  var colorIds = [
+    CalendarApp.EventColor.RED,
+    CalendarApp.EventColor.ORANGE,
+    CalendarApp.EventColor.YELLOW,
+    CalendarApp.EventColor.GREEN,
+    CalendarApp.EventColor.CYAN,
+    CalendarApp.EventColor.BLUE,
+    CalendarApp.EventColor.PURPLE,
+    CalendarApp.EventColor.MAGENTA,
+    CalendarApp.EventColor.GRAY
+  ];
+
+  // Loop through the data and create events
+  for (var i = 1; i < data.length; i++) { // Assuming data starts from row 2 (skipping headers)
+    var row = data[i];
+    var title = row[0]; // Assuming the title is in the first column (column A)
+    var startDate = row[1]; // Assuming the start date is in the second column (column B)
+    var endDate = row[2]; // Assuming the end date is in the third column (column C)
+
+    // Select a random color ID
+    var colorId = colorIds[Math.floor(Math.random() * colorIds.length)];
+
+    // Get the color value from the colorId
+    var colorValue = getColorValue(colorId);
+
+    // Create the event
+    var event;
+
+    if (!endDate || startDate === endDate) {
+      // Create an all-day event if no end date or same start and end date
+      event = calendar.createAllDayEvent(title, new Date(startDate));
+    } else {
+      // Create a normal event with start and end time
+      event = calendar.createAllDayEvent(title, new Date(startDate), new Date(endDate));
+    }
+
+    // Set the color of the event
+    event.setColor(colorValue);
+  }
+}
+
+function getColorValue(colorId) {
+  var colorValue;
+
+  switch (colorId) {
+    case CalendarApp.EventColor.RED:
+      colorValue = "1"; // Red color
+      break;
+    case CalendarApp.EventColor.ORANGE:
+      colorValue = "2"; // Orange color
+      break;
+    case CalendarApp.EventColor.YELLOW:
+      colorValue = "3"; // Yellow color
+      break;
+    case CalendarApp.EventColor.GREEN:
+      colorValue = "4"; // Green color
+      break;
+    case CalendarApp.EventColor.CYAN:
+      colorValue = "5"; // Cyan color
+      break;
+    case CalendarApp.EventColor.BLUE:
+      colorValue = "6"; // Blue color
+      break;
+    case CalendarApp.EventColor.PURPLE:
+      colorValue = "7"; // Purple color
+      break;
+    case CalendarApp.EventColor.MAGENTA:
+      colorValue = "8"; // Magenta color
+      break;
+    case CalendarApp.EventColor.GRAY:
+      colorValue = "9"; // Gray color
+      break;
+    default:
+      colorValue = "10"; // Black color (fallback)
+      break;
+  }
+
+  return colorValue;
+}
